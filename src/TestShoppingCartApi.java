@@ -48,7 +48,7 @@ public class TestShoppingCartApi {
 		assertFalse(testItem == null);
 		assertEquals(testItem.name, itemName);
 		assertEquals(testItem.desc, itemDescription);
-		assertTrue(testItem.price - itemPrice == 0);
+		assertTrue(testItem.price == itemPrice);
 		assertEquals(testItem.picture, itemPicture);
 		assertEquals(testItem.quantity, itemQuantity);
 	}
@@ -90,5 +90,21 @@ public class TestShoppingCartApi {
 		testCart.addItemToCart(testITem);
 		
 		System.out.println(testCart.toJSONString());
+	}
+	void testCartSubtotalCalculation() {
+		Cart testCart = createGuestCart();
+		Item testItem = createItemOne();
+		
+		testCart.addItemToCart(testItem);
+		
+		assertTrue(testCart.calculateSubtotal() == 44.95);
+	}
+	void testCartTotalCalculation() {
+		Cart testCart = createGuestCart();
+		Item testItem = createItemOne();
+		
+		testCart.addItemToCart(testItem);
+		
+		assertTrue(testCart.calculateTotal() == 44.95);
 	}
 }
