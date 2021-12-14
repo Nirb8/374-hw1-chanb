@@ -5,10 +5,12 @@ public class ShoppingCartApi {
 //		
 //	}
 	ArrayList<Cart> carts;
-	ArrayList<Item> stock;
 	ArrayList<Discount> discounts; //Initialize these in the test cases
 	public ShoppingCartApi() {
 		carts = new ArrayList<Cart>();
-		stock = new ArrayList<Item>();
+	}
+	public String handleRequest(String request) {
+		
+		return request;
 	}
 }

@@ -4,7 +4,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-public class Item {
+public class Item extends JSONable{
 	String itemID;
 	String name;
 	String desc;
@@ -45,8 +45,5 @@ public class Item {
 		item.put("itemQuantity", String.valueOf(quantity));
 		
 		return item;
-	}
-	public String toJSONString() {
-		return this.toJSONObject().toJSONString();
 	}
 }

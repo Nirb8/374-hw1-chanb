@@ -21,6 +21,12 @@ public class TestShoppingCartApi {
 		
 		return testItem;
 	}
+	Discount createDiscountOne() {
+		String discountCode = "5318008";
+		double percentOff = 50;
+		Discount testDiscount = new Discount(discountCode, percentOff);
+		return testDiscount;
+	}
 	@Test
 	void testCreateCartWithStateCodeOnly() {
 		Cart testCart = new Cart(null,"IN");
@@ -89,8 +95,9 @@ public class TestShoppingCartApi {
 		Item testITem = createItemOne();
 		testCart.addItemToCart(testITem);
 		
-		System.out.println(testCart.toJSONString());
+		//System.out.println(testCart.toJSONString());
 	}
+	@Test
 	void testCartSubtotalCalculation() {
 		Cart testCart = createGuestCart();
 		Item testItem = createItemOne();
@@ -99,6 +106,7 @@ public class TestShoppingCartApi {
 		
 		assertTrue(testCart.calculateSubtotal() == 44.95);
 	}
+	@Test
 	void testCartTotalCalculation() {
 		Cart testCart = createGuestCart();
 		Item testItem = createItemOne();
@@ -106,5 +114,24 @@ public class TestShoppingCartApi {
 		testCart.addItemToCart(testItem);
 		
 		assertTrue(testCart.calculateTotal() == 44.95);
+	}
+	@Test
+	void testAddDiscountToCart() {
+		Cart testCart = createUserCart();
+		Discount testDiscount = createDiscountOne();
+		testCart.addDiscountToCart(testDiscount);
+		assertFalse(testCart.discounts.isEmpty());
+		assertTrue(testCart.discounts.contains(testDiscount));
+	}
+	@Test
+	void testCartTotalCalculationWithDiscounts() {
+		Cart testCart = createGuestCart();
+		Item testItem = createItemOne();
+		Discount testDiscount = createDiscountOne();
+		
+		testCart.addItemToCart(testItem);
+		testCart.addDiscountToCart(testDiscount);
+		
+		assertTrue(testCart.calculateTotal() == 22.475);
 	}
 }
