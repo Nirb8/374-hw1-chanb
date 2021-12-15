@@ -91,11 +91,20 @@ public class TestShoppingCartApi {
 	}
 	@Test
 	void testCartConversionToJSONFormatAndBack() {
-		Cart testCart = createGuestCart();
-		Item testITem = createItemOne();
-		testCart.addItemToCart(testITem);
+		Cart testCart = createUserCart();
+		Item testItem = createItemOne();
+		testCart.addItemToCart(testItem);
+		Discount testDiscount = createDiscountOne();
+		testCart.addDiscountToCart(testDiscount);
 		
-		//System.out.println(testCart.toJSONString());
+		String json = testCart.toJSONString();
+		
+		Cart convertedBackCart = new Cart(json);
+		assertEquals(convertedBackCart.items.size(), testCart.items.size());
+		assertEquals(convertedBackCart.discounts.size(), testCart.discounts.size());
+		assertEquals(convertedBackCart.stateCode, testCart.stateCode);
+		assertEquals(convertedBackCart.cartID, testCart.cartID);
+		assertEquals(convertedBackCart.userID, testCart.userID);
 	}
 	@Test
 	void testCartSubtotalCalculation() {
@@ -113,7 +122,7 @@ public class TestShoppingCartApi {
 		
 		testCart.addItemToCart(testItem);
 		
-		assertTrue(testCart.calculateTotal() == 44.95);
+		assertTrue(testCart.calculateTotal() == 48.55);
 	}
 	@Test
 	void testAddDiscountToCart() {
@@ -132,6 +141,6 @@ public class TestShoppingCartApi {
 		testCart.addItemToCart(testItem);
 		testCart.addDiscountToCart(testDiscount);
 		
-		assertTrue(testCart.calculateTotal() == 22.475);
+		assertTrue(testCart.calculateTotal() == 24.27);
 	}
 }

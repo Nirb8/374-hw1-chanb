@@ -1,4 +1,6 @@
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 public class Discount extends JSONable{
 	String discountCode;
@@ -6,6 +8,18 @@ public class Discount extends JSONable{
 	public Discount(String discountCode, double percentOff) {
 		this.discountCode = discountCode;
 		this.percentOff = percentOff;
+	}
+	public Discount(String JSONString) {
+		JSONParser jsonParser = new JSONParser();
+		try {
+			JSONObject discount = (JSONObject) jsonParser.parse(JSONString);
+			this.discountCode = (String) discount.get("discountCode");
+			this.percentOff = Double.parseDouble((String) discount.get("percentOff"));
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 	}
 	public double applyDiscountToTotal(double total) {
 		double actualPercentOff = this.percentOff/100;

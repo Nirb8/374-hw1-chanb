@@ -22,24 +22,31 @@ public class Cart extends JSONable{
 		this.stateCode = stateCode;
 	}
 	public Cart(String JSONString) {
+		this.items = new ArrayList<Item>();
+		this.discounts = new ArrayList<Discount>();
 		JSONParser jsonParser = new JSONParser();
 		try {
 			JSONObject cart = (JSONObject) jsonParser.parse(JSONString);
 			JSONArray items = (JSONArray) cart.get("items");
 			Iterator<JSONObject> itemIterator = items.iterator();
 			while(itemIterator.hasNext()) {
-				//do all the items and chonk them in an arraylist
+				//do all the items and put them in the arraylist
+				Item currentItem = new Item(itemIterator.next().toJSONString());
+				this.items.add(currentItem);
 			}
 			
 			JSONArray discounts = (JSONArray) cart.get("discounts");
 			Iterator<JSONObject> discountIterator = discounts.iterator();
 			while(discountIterator.hasNext()) {
-				//do all the discounts and chonk them in an arraylist
+				//do all the discounts and put them in the arraylist
+				Discount currentDiscount = new Discount(discountIterator.next().toJSONString());
+				this.discounts.add(currentDiscount);
 			}
+			this.cartID = (String) cart.get("cartID");
+			this.userID = (String) cart.get("userID");
+			this.stateCode = (String) cart.get("stateCode");
 			
-			//TODO: handle the rest of the cart specific fields
 		} catch (ParseException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -91,7 +98,9 @@ public class Cart extends JSONable{
 		for(Discount d : discounts) {
 			currentTotal = d.applyDiscountToTotal(currentTotal);
 		}
-		return currentTotal;
+		//apply tax after discounts
+		currentTotal += TaxCalculator.calculateTaxAmount(stateCode, currentTotal);
+		return (double) Math.round(currentTotal * 100) / 100;
 	}
 
 }
