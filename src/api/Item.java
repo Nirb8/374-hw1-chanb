@@ -63,4 +63,8 @@ public class Item extends JSONable{
 		this.quantity -= quantity;
 		return newItem;
 	}
+	public void mergeItem(Item toMerge) {
+		int quantityToMerge = toMerge.quantity;
+		this.quantity += quantityToMerge;
+	}
 }
