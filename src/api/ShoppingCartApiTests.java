@@ -110,7 +110,9 @@ public class ShoppingCartApiTests {
 		responseString = api.handleRequest(request.toJSONString());
 		assertEquals(responseString, "{\"success\":\"OK\"}");
 		
-		assertEquals(testItem.quantity, 0);
+		
+		testItem.quantity = 0; //manually set the item to out of stock
+		
 		assertTrue(testCart.checkIfItemIsInCartById(testItem.itemID));
 		assertTrue(testCart.items.get(0).quantity == 5);
 		

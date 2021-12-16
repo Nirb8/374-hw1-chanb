@@ -18,6 +18,7 @@ public class TestEnvironmentGenerator {
 		return randomUserCart;
 	}
 	public static Item createItemOne() {
+		String itemID = "3714a497-71e8-47f6-9667-c3df2d648656";
 		String itemName = "Pocky Sticks";
 		String itemDescription = "Delicious Creamy Chocolate Covered Biscuit Sticks";
 		double itemPrice = 8.99;

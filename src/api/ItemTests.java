@@ -51,7 +51,7 @@ public class ItemTests {
 		Item takenItem = testItem.takeFrom(3);
 		
 		assertEquals(testItem.itemID, takenItem.itemID); //verify that the taken item is the same as the source item
-		assertEquals(testItem.quantity, 2); //testItem had 3 taken away from it, so it's quantity is down to 5
+
 		assertEquals(takenItem.quantity, 3);
 	}
 	@Test
@@ -62,5 +62,24 @@ public class ItemTests {
 		
 		assertEquals(attemptedTakenItem, null); //no item should be taken
 		assertEquals(testItem.quantity, 5); // make sure that testItem did not have it's quantity reduced
+	}
+	@Test
+	void testMergeItem() {
+		Item testItem = TestEnvironmentGenerator.createItemOne();
+		Item testItem2 = TestEnvironmentGenerator.createItemOne();
+
+		assertEquals(testItem.quantity, 5);
+		testItem.mergeItem(testItem2);
+		assertEquals(testItem.quantity, 10);
+	}
+	@Test
+	void testMergeItemNegative() {
+		Item testItem = TestEnvironmentGenerator.createItemOne();
+		Item testItem2 = testItem.takeFrom(-3);
+		Item testItem3 = TestEnvironmentGenerator.createItemOne();
+		
+		assertEquals(testItem3.quantity, 5);
+		testItem3.mergeItem(testItem2);
+		assertEquals(testItem3.quantity, 2);
 	}
 }
