@@ -72,11 +72,13 @@ public class Item extends JSONable {
 
 	public void mergeItem(Item toMerge) {
 
-		if(this.itemID.equals(toMerge.itemID)) {
+		if(!(this.itemID.equals(toMerge.itemID))) {
 			return;
+		}else {
+			int quantityToMerge = toMerge.quantity;
+			this.quantity += quantityToMerge;
 		}
-		int quantityToMerge = toMerge.quantity;
-		this.quantity += quantityToMerge;
+		
 		
 	}
 }

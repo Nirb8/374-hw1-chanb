@@ -24,7 +24,18 @@ public class TestEnvironmentGenerator {
 		double itemPrice = 8.99;
 		String itemPicture = "https://target.scene7.com/is/image/Target/GUEST_d0eb439c-3f20-4eb7-be83-471c10b67778?wid=488&hei=488&fmt=pjpeg";
 		int itemQuantity = 5;
-		Item testItem = new Item(itemName, itemDescription, itemPrice, itemPicture, itemQuantity);
+		Item testItem = new Item(itemID, itemName, itemDescription, itemPrice, itemPicture, itemQuantity);
+		
+		return testItem;
+	}
+	public static Item createItemTwo() {
+		String itemID = "d67685b8-15de-4c91-b915-f3be1eb46ff6";
+		String itemName = "Beef Jerky";
+		String itemDescription = "Meat snack exquisitely seasoned to perfection";
+		double itemPrice = 11.99;
+		String itemPicture = "https://itsjerky.com/wp-content/uploads/2017/12/jerky-on-wooden-cutting-board.png";
+		int itemQuantity = 5;
+		Item testItem = new Item(itemID, itemName, itemDescription, itemPrice, itemPicture, itemQuantity);
 		
 		return testItem;
 	}
