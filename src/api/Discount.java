@@ -1,3 +1,4 @@
+package api;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -23,7 +24,7 @@ public class Discount extends JSONable{
 	}
 	public double applyDiscountToTotal(double total) {
 		double actualPercentOff = this.percentOff/100;
-		return total*actualPercentOff;
+		return total - total*actualPercentOff;
 	}
 	@SuppressWarnings("unchecked")
 	public JSONObject toJSONObject() {

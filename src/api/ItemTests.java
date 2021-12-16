@@ -1,0 +1,66 @@
+package api;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import org.junit.jupiter.api.Test;
+
+public class ItemTests {
+	@Test
+	void testCreateItem() {
+		String itemName = "Pocky Sticks";
+		String itemDescription = "Delicious Creamy Chocolate Covered Biscuit Sticks";
+		double itemPrice = 8.99;
+		String itemPicture = "https://target.scene7.com/is/image/Target/GUEST_d0eb439c-3f20-4eb7-be83-471c10b67778?wid=488&hei=488&fmt=pjpeg";
+		int itemQuantity = 5;
+		Item testItem = new Item(itemName, itemDescription, itemPrice, itemPicture, itemQuantity);
+		
+		assertFalse(testItem == null);
+		assertEquals(testItem.name, itemName);
+		assertEquals(testItem.desc, itemDescription);
+		assertTrue(testItem.price == itemPrice);
+		assertEquals(testItem.picture, itemPicture);
+		assertEquals(testItem.quantity, itemQuantity);
+	}
+	@Test
+	void testItemConversionToJSONFormatAndBack() {
+		Item testItem = TestEnvironmentGenerator.createItemOne();
+		//System.out.println(testItem.toJSONString());
+		String itemName = "Pocky Sticks";
+		String itemDescription = "Delicious Creamy Chocolate Covered Biscuit Sticks";
+		double itemPrice = 8.99;
+		String itemPicture = "https://target.scene7.com/is/image/Target/GUEST_d0eb439c-3f20-4eb7-be83-471c10b67778?wid=488&hei=488&fmt=pjpeg";
+		int itemQuantity = 5;
+		
+		String json = testItem.toJSONString();
+		
+		Item convertedBackItem = new Item(json);
+		
+		assertFalse(convertedBackItem == null);
+		assertEquals(convertedBackItem.name, itemName);
+		assertEquals(convertedBackItem.desc, itemDescription);
+		assertTrue(convertedBackItem.price - itemPrice == 0);
+		assertEquals(convertedBackItem.picture, itemPicture);
+		assertEquals(convertedBackItem.quantity, itemQuantity);
+	}
+	@Test
+	void testItemTakeFrom() {
+		Item testItem = TestEnvironmentGenerator.createItemOne();
+		assertEquals(testItem.quantity, 5);
+		Item takenItem = testItem.takeFrom(3);
+		
+		assertEquals(testItem.itemID, takenItem.itemID); //verify that the taken item is the same as the source item
+		assertEquals(testItem.quantity, 2); //testItem had 3 taken away from it, so it's quantity is down to 5
+		assertEquals(takenItem.quantity, 3);
+	}
+	@Test
+	void testItemTakeFromTooMany() {
+		Item testItem = TestEnvironmentGenerator.createItemOne();
+		
+		Item attemptedTakenItem = testItem.takeFrom(6);
+		
+		assertEquals(attemptedTakenItem, null); //no item should be taken
+		assertEquals(testItem.quantity, 5); // make sure that testItem did not have it's quantity reduced
+	}
+}

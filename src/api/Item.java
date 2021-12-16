@@ -1,3 +1,4 @@
+package api;
 import java.util.UUID;
 
 import org.json.simple.JSONObject;
@@ -11,6 +12,14 @@ public class Item extends JSONable{
 	double price;
 	String picture;
 	int quantity;
+	public Item(String itemID,String itemName, String itemDescription, double itemPrice, String itemPicture, int quantity) {
+		this.itemID = itemID;
+		this.name = itemName;
+		this.desc = itemDescription;
+		this.price = itemPrice;
+		this.picture = itemPicture;
+		this.quantity = quantity;
+	}
 	public Item(String itemName, String itemDescription, double itemPrice, String itemPicture, int quantity) {
 		this.itemID = UUID.randomUUID().toString();
 		this.name = itemName;
@@ -45,5 +54,13 @@ public class Item extends JSONable{
 		item.put("itemQuantity", String.valueOf(quantity));
 		
 		return item;
+	}
+	public Item takeFrom(int quantity) {
+		if(quantity>this.quantity) {
+			return null;
+		}
+		Item newItem = new Item(this.itemID, this.name, this.desc, this.price, this.picture, quantity);
+		this.quantity -= quantity;
+		return newItem;
 	}
 }

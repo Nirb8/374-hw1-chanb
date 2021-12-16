@@ -1,3 +1,4 @@
+package api;
 import org.json.simple.JSONObject;
 
 public abstract class JSONable {

@@ -1,3 +1,4 @@
+package api;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.UUID;
@@ -60,6 +61,14 @@ public class Cart extends JSONable{
 	public void addDiscountToCart(Discount discount) {
 		discounts.add(discount);
 	}
+	public boolean checkIfItemIsInCartById(String itemID) {
+		for(Item i : items) {
+			if(i.itemID.equals(itemID)) {
+				return true;
+			}
+		}
+		return false;
+	}
 
 	@SuppressWarnings("unchecked")
 	public JSONObject toJSONObject() {
@@ -68,9 +77,15 @@ public class Cart extends JSONable{
 		cart.put("cartID", cartID);
 		cart.put("userID", userID);
 		cart.put("stateCode", stateCode);
+		double subtotal = calculateSubtotal();
+		double total = calculateTotal();
+		double discountedAmount = calculateDiscountedAmount(subtotal);
+		double estimatedTaxes = calculateEstimatedTaxes(subtotal - discountedAmount);
 		cart.put("subtotal", calculateSubtotal());
-		cart.put("total", calculateTotal());
-
+		cart.put("total", total);
+		cart.put("estimatedTaxes", estimatedTaxes);
+		cart.put("amountSavedByDiscounts", discountedAmount);
+		
 		JSONArray itemsJSON = new JSONArray();
 		for (Item i : this.items) {
 			itemsJSON.add(i.toJSONObject());
@@ -94,13 +109,23 @@ public class Cart extends JSONable{
 	}
 
 	public double calculateTotal() {
-		double currentTotal = calculateSubtotal();
+		double total = calculateSubtotal();
+		total = total - calculateDiscountedAmount(total);
+		//apply tax after discounts
+		total += calculateEstimatedTaxes(total);
+		return (double) Math.round(total * 100) / 100;
+	}
+	
+	public double calculateEstimatedTaxes(double total) {
+		return TaxCalculator.calculateTaxAmount(stateCode, total);
+	}
+	
+	public double calculateDiscountedAmount(double total) {
+		double currentTotal = total;
 		for(Discount d : discounts) {
 			currentTotal = d.applyDiscountToTotal(currentTotal);
 		}
-		//apply tax after discounts
-		currentTotal += TaxCalculator.calculateTaxAmount(stateCode, currentTotal);
-		return (double) Math.round(currentTotal * 100) / 100;
+		return total - currentTotal;
 	}
 
 }
