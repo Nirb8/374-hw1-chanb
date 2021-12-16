@@ -1,5 +1,6 @@
 package api;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -9,10 +10,12 @@ public class ShoppingCartApi {
 	ArrayList<Cart> carts;
 	ArrayList<Discount> discounts; //Initialize these in the test cases
 	ArrayList<Item> items;
+	HashMap<String, Integer> userDiscountLockout;
 	public ShoppingCartApi() {
 		carts = new ArrayList<Cart>();
 		discounts = new ArrayList<Discount>();
 		items = new ArrayList<Item>();
+		userDiscountLockout = new HashMap<String, Integer>();
 	}
 	@SuppressWarnings("unchecked")
 	public String writeError(String message) {
@@ -54,7 +57,24 @@ public class ShoppingCartApi {
 					}
 					requestedCart.addItemToCart(toAdd.takeFrom(quantityToAdd));
 					return writeSuccess("OK");
-				case "add-discount":
+				case "apply-discount":
+					String discountCodeToAdd = (String) request.get("discountCode");
+					Discount toApply = this.getDiscountByCode(discountCodeToAdd);
+					String requestedUserID = requestedCart.userID;
+					if(toApply == null || userDiscountLockout.get(requestedUserID) >=5) {
+						//discount code failed or user is locked out
+						if(requestedUserID != null) {
+							if(userDiscountLockout.containsKey(requestedUserID)) {
+								int current = userDiscountLockout.get(requestedUserID);
+								current++;
+								userDiscountLockout.put(requestedUserID, current);
+							}
+						}
+					} else {
+						requestedCart.addDiscountToCart(toApply);
+						return writeSuccess("OK");
+					}
+					
 					break;
 				case "modify-item-quantity":
 					break;
@@ -83,5 +103,14 @@ public class ShoppingCartApi {
 		}
 		return null;
 	}
+	public Discount getDiscountByCode(String discountCode) {
+		for(Discount d : discounts) {
+			if(d.discountCode.equals(discountCode)) {
+				return d;
+			}
+		}
+		return null;
+	};
+	
 	
 }

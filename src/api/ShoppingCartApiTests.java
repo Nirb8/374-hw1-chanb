@@ -28,6 +28,16 @@ public class ShoppingCartApiTests {
 		assertEquals(api.getItemByID(testItem.itemID), testItem);
 	}
 	@Test
+	void testGetDiscountByCode() {
+		ShoppingCartApi api = TestEnvironmentGenerator.createApi();
+		Discount testDiscount = TestEnvironmentGenerator.createDiscountOne();
+		
+		api.discounts.add(testDiscount);
+		
+		assertEquals(api.getDiscountByCode(testDiscount.discountCode).discountCode, testDiscount.discountCode);
+		assertTrue(api.getDiscountByCode(testDiscount.discountCode).percentOff == testDiscount.percentOff);
+	}
+	@Test
 	void testWriteError() {
 		ShoppingCartApi api = TestEnvironmentGenerator.createApi();
 		String errorResponse = api.writeError("error message");

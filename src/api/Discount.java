@@ -6,9 +6,11 @@ import org.json.simple.parser.ParseException;
 public class Discount extends JSONable{
 	String discountCode;
 	double percentOff;
-	public Discount(String discountCode, double percentOff) {
+	boolean isExpired;
+	public Discount(String discountCode, double percentOff, boolean isExpired) {
 		this.discountCode = discountCode;
 		this.percentOff = percentOff;
+		this.isExpired = false;
 	}
 	public Discount(String JSONString) {
 		JSONParser jsonParser = new JSONParser();
