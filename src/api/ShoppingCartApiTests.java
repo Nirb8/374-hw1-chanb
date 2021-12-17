@@ -248,8 +248,18 @@ public class ShoppingCartApiTests {
 		responseString = api.handleRequest(request.toJSONString());
 		Cart responseCart = new Cart(responseString);
 		
-		assertEquals(responseCart.items.size(), testCart.items.size());
+		assertEquals(responseCart.items.size(), 1);
 		assertEquals(5, responseCart.getItemFromCartByID(testItem.itemID).quantity);
+		
+		request = new JSONObject();
+		request.put("type", "modify-item-quantity");
+		request.put("cartID", testCart.cartID);
+		request.put("itemID", testItem.itemID);
+		request.put("quantity", 0);
+		responseString = api.handleRequest(request.toJSONString());
+		responseCart = new Cart(responseString);
+		
+		assertEquals(responseCart.items.size(), 0);
 		
 		request = new JSONObject();
 		request.put("type", "modify-item-quantity");

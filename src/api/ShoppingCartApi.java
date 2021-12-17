@@ -103,7 +103,11 @@ public class ShoppingCartApi {
 				if (existingItem == null) {
 					return writeError("Item not in cart");
 				}
-
+				if(quantityToModifyTo == 0) {
+					requestedCart.items.remove(existingItem);
+					return requestedCart.toJSONString();
+				}
+				
 				int amountToTake = quantityToModifyTo - existingItem.quantity;
 				Item taken = toMod.takeFrom(amountToTake);
 				if (taken == null) {
