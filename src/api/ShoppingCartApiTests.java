@@ -1,8 +1,6 @@
 package api;
 import static org.junit.Assert.*;
 
-import java.util.UUID;
-
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -49,6 +47,17 @@ public class ShoppingCartApiTests {
 		String successResponse = api.writeSuccess("success message");
 		assertEquals(successResponse, "{\"success\":\"success message\"}");
 	}
+	@Test
+	void testUserLockoutIncrement() {
+		ShoppingCartApi api = TestEnvironmentGenerator.createApi();
+		Cart testCart = TestEnvironmentGenerator.createUserCart();
+		api.carts.add(testCart);
+		
+		api.doUserLockoutIncrement(testCart.userID);
+		assertTrue(api.userDiscountLockout.containsKey(testCart.userID));
+		int userLockout = api.userDiscountLockout.get(testCart.userID);
+		assertEquals(1, userLockout);
+	}
 	@SuppressWarnings("unchecked")
 	@Test
 	void testHandleViewCartRequest() {
@@ -81,7 +90,6 @@ public class ShoppingCartApiTests {
 			assertEquals(response.get("estimatedTaxes"), 1.12);
 			assertEquals(response.get("amountSavedByDiscounts"), 22.475);
 		} catch (ParseException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -120,10 +128,17 @@ public class ShoppingCartApiTests {
 		responseString = api.handleRequest(request.toJSONString());
 		assertEquals(responseString, "{\"success\":\"OK\"}");
 		
+		request = new JSONObject();
+		request.put("type", "add-item");
+		request.put("cartID", testCart.cartID);
+		request.put("itemID", testItem.itemID);
+		request.put("quantity", 5);
+		responseString = api.handleRequest(request.toJSONString());
+		assertEquals(responseString, "{\"error\":\"Item already in cart\"}");
 		
 		testItem.quantity = 0; //manually set the item to out of stock
 		
-		assertTrue(testCart.checkIfItemIsInCartById(testItem.itemID));
+		assertTrue(testCart.getItemFromCartByID(testItem.itemID) != null);
 		assertTrue(testCart.items.get(0).quantity == 5);
 		
 		
@@ -135,5 +150,123 @@ public class ShoppingCartApiTests {
 		responseString = api.handleRequest(request.toJSONString());
 		assertEquals(responseString, "{\"error\":\"Item 'Pocky Sticks' is out of stock\"}");
 	}
+	@SuppressWarnings("unchecked")
+	@Test
+	void testHandleApplyDiscountRequest() {
+		ShoppingCartApi api = TestEnvironmentGenerator.createApi();
+		Cart testCart = TestEnvironmentGenerator.createGuestCart();
+		Cart userCart = TestEnvironmentGenerator.createUserCart();
+		Discount testDiscount = TestEnvironmentGenerator.createDiscountOne();
+		Discount expiredDiscount = TestEnvironmentGenerator.createDiscountTwo();
+		
+		api.carts.add(testCart);
+		api.carts.add(userCart);
+		api.discounts.add(testDiscount);
+		api.discounts.add(expiredDiscount);
+		
+		JSONObject request = new JSONObject();
+		request.put("type", "apply-discount");
+		request.put("cartID", testCart.cartID);
+		request.put("discountCode", expiredDiscount.discountCode);
+		
+		String responseString = api.handleRequest(request.toJSONString());
+		assertEquals(responseString, "{\"error\":\"That discount has expired\"}");
+		
+		request = new JSONObject();
+		request.put("type", "apply-discount");
+		request.put("cartID", testCart.cartID);
+		request.put("discountCode", "mrgglglgllgg");
+		
+		responseString = api.handleRequest(request.toJSONString());
+		
+		assertEquals(responseString, "{\"error\":\"Invalid discount code\"}");
 	
+		request = new JSONObject();
+		request.put("type", "apply-discount");
+		request.put("cartID", testCart.cartID);
+		request.put("discountCode", testDiscount.discountCode);
+		
+		responseString = api.handleRequest(request.toJSONString());
+		
+		assertEquals(responseString, "{\"success\":\"OK\"}");
+		assertTrue(testCart.discounts.isEmpty() == false); //discount successfully added to cart
+		
+		//test carts that belong to users
+		request = new JSONObject();
+		request.put("type", "apply-discount");
+		request.put("cartID", userCart.cartID);
+		request.put("discountCode", "mrgglglgllgg");
+		
+		for(int i = 0; i<5;i++) {
+			responseString = api.handleRequest(request.toJSONString());
+		}
+		
+		request = new JSONObject();
+		request.put("type", "apply-discount");
+		request.put("cartID", userCart.cartID);
+		request.put("discountCode", testDiscount.discountCode);
+		
+		responseString = api.handleRequest(request.toJSONString());
+		
+		assertEquals(responseString, "{\"error\":\"\"}");
+	}
+	@SuppressWarnings("unchecked")
+	@Test
+	void testHandleModifyItemQuantityRequest() {
+		ShoppingCartApi api = TestEnvironmentGenerator.createApi();
+		Cart testCart = TestEnvironmentGenerator.createGuestCart();
+		Cart testCart2 = TestEnvironmentGenerator.createUserCart();
+		Item testItem = TestEnvironmentGenerator.createItemOne();
+		
+		api.carts.add(testCart);
+		api.carts.add(testCart2);
+		api.items.add(testItem);
+		
+		testCart.addItemToCart(testItem.takeFrom(2));
+		
+		JSONObject request = new JSONObject();
+		request.put("type", "modify-item-quantity");
+		request.put("cartID", testCart.cartID);
+		request.put("itemID", "c74d92e7-cc56-46ae-8c71-08cff7309c7d");
+		request.put("quantity", 50);
+		String responseString = api.handleRequest(request.toJSONString());
+		assertEquals(responseString, "{\"error\":\"Item not found\"}");
+		
+		request = new JSONObject();
+		request.put("type", "modify-item-quantity");
+		request.put("cartID", testCart.cartID);
+		request.put("itemID", testItem.itemID);
+		request.put("quantity", 50);
+		responseString = api.handleRequest(request.toJSONString());
+		assertEquals(responseString, "{\"error\":\"Not enough stock to fulfill quantity requested\"}");
+		
+		request = new JSONObject();
+		request.put("type", "modify-item-quantity");
+		request.put("cartID", testCart.cartID);
+		request.put("itemID", testItem.itemID);
+		request.put("quantity", 5);
+		responseString = api.handleRequest(request.toJSONString());
+		Cart responseCart = new Cart(responseString);
+		
+		assertEquals(responseCart.items.size(), testCart.items.size());
+		assertEquals(5, responseCart.getItemFromCartByID(testItem.itemID).quantity);
+		
+		request = new JSONObject();
+		request.put("type", "modify-item-quantity");
+		request.put("cartID", testCart2.cartID);
+		request.put("itemID", testItem.itemID);
+		request.put("quantity", 5);
+		responseString = api.handleRequest(request.toJSONString());
+		assertEquals(responseString, "{\"error\":\"Item not in cart\"}");
+		
+		testItem.quantity = 0; //manually set to out of stock
+		
+		request = new JSONObject();
+		request.put("type", "modify-item-quantity");
+		request.put("cartID", testCart2.cartID);
+		request.put("itemID", testItem.itemID);
+		request.put("quantity", 5);
+		responseString = api.handleRequest(request.toJSONString());
+		assertEquals(responseString, "{\"error\":\"Item 'Pocky Sticks' is out of stock\"}");
+	}
 }

@@ -23,7 +23,7 @@ public class ItemTests {
 		assertEquals(testItem.picture, itemPicture);
 		assertEquals(testItem.quantity, itemQuantity);
 	}
-
+	
 	@Test
 	void testItemConversionToJSONFormatAndBack() {
 		Item testItem = TestEnvironmentGenerator.createItemOne();

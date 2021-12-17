@@ -63,9 +63,9 @@ public class CartTests {
 		
 		testCart.addItemToCart(testItem);
 		
-		assertTrue(testCart.checkIfItemIsInCartById(testItem.itemID));
+		assertEquals(testCart.getItemFromCartByID(testItem.itemID), testItem);
 		String notInCart = "b397529e-bf9c-4f3e-aff6-0d01a3daeceb";
-		assertFalse(testCart.checkIfItemIsInCartById(notInCart));
+		assertTrue(testCart.getItemFromCartByID(notInCart) == null);
 	}
 	@Test
 	void testCartSubtotalCalculation() {

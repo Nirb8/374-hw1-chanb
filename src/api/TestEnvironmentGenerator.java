@@ -51,6 +51,14 @@ public class TestEnvironmentGenerator {
 		Discount testDiscount = new Discount(discountCode, percentOff, isExpired);
 		return testDiscount;
 	}
+	// creates an expired discount
+	public static Discount createDiscountTwo() {
+		String discountCode = "20OFF";
+		double percentOff = 20;
+		boolean isExpired = true;
+		Discount expiredDiscount = new Discount(discountCode, percentOff, isExpired);
+		return expiredDiscount;
+	}
 
 	public static ShoppingCartApi createApi() {
 		ShoppingCartApi api = new ShoppingCartApi();

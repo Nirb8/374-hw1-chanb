@@ -16,4 +16,10 @@ public class DiscountTests {
 		assertEquals(testDiscount.discountCode, convertedBackDiscount.discountCode);
 		assertTrue(testDiscount.percentOff == convertedBackDiscount.percentOff);
 	}
+	@Test
+	void testApplyDiscountToTotal() {
+		Discount testDiscount = TestEnvironmentGenerator.createDiscountOne();
+		double appliedTotal = testDiscount.applyDiscountToTotal(50.0);
+		assertTrue(25.0 == appliedTotal);
+	}
 }

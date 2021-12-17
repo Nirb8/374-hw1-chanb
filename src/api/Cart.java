@@ -61,13 +61,13 @@ public class Cart extends JSONable{
 	public void addDiscountToCart(Discount discount) {
 		discounts.add(discount);
 	}
-	public boolean checkIfItemIsInCartById(String itemID) {
+	public Item getItemFromCartByID(String itemID) {
 		for(Item i : items) {
 			if(i.itemID.equals(itemID)) {
-				return true;
+				return i;
 			}
 		}
-		return false;
+		return null;
 	}
 
 	@SuppressWarnings("unchecked")

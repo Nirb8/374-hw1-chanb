@@ -10,7 +10,7 @@ public class Discount extends JSONable{
 	public Discount(String discountCode, double percentOff, boolean isExpired) {
 		this.discountCode = discountCode;
 		this.percentOff = percentOff;
-		this.isExpired = false;
+		this.isExpired = isExpired;
 	}
 	public Discount(String JSONString) {
 		JSONParser jsonParser = new JSONParser();
